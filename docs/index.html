@@ -89,7 +89,7 @@ div.tablet {
   <div class="container" >
   <div class="row" style="border: 1px solid lightgray; border-radius: 8px;">
     <div class="col-sm-1" >
-      <img src="/ur_cun.png">
+      <img src="/ur3-viz/ur_cun.png">
     </div>
     <div class="col-sm-3" >
       <p id="p_year" style="font-family: 'Raleway', sans-serif; font-size: 22px; font-weight: 300;">2048 BC</p>
@@ -281,7 +281,7 @@ div.tablet {
       .on("tick",ticked);
 
 
-  d3.json("/all.json", function(error, graph) {
+  d3.json("/ur3-viz/all.json", function(error, graph) {
     if (error) throw error;
     all_graphdata = graph;
     load_graphyear(2048);
