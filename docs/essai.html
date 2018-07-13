@@ -1,0 +1,480 @@
+
+
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<style>
+
+@font-face {
+    font-family: 'cuneiform';
+    src: url('/static/NotoSansCuneiform-Regular.ttf') format('truetype');
+}
+
+/*html {
+  background-image: url(/static/bk.jpg);
+  background-repeat: repeat;
+}*/
+
+.links line {
+  stroke: lightsteelblue;
+  stroke-opacity: 0.2;
+  stroke-width: 1px;
+}
+
+.nodes circle {
+  stroke: white;
+  stroke-opacity: 1.0;
+  stroke-width: 0.7px;
+  fill: #bbbbbb;
+  r: 3;
+}
+
+div.tooltip {
+  position: absolute;
+  text-align: center;
+  width: 175px;
+  height: 25px;
+  padding: 2px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  font-weight:300;
+  color: #FFFFFF;
+  background: steelblue;
+  border: 0px;
+  border-radius: 4px;
+  pointer-events: none;
+  opacity:0;
+  box-shadow: 2px 2px 5px steelblue;
+}
+div.tablet {
+  position: absolute;
+  text-align: center;
+  height: 600px;
+  padding: 2px;
+  font-family: sans-serif;
+  font-size: 10px;
+  color: #FFFFFF;
+  background: lightslategray;
+  border: 0px;
+  border-radius: 4px;
+  pointer-events: none;
+  opacity:0;
+  box-shadow: 2px 2px 5px lightslategray;
+}
+
+.slider-overlay {
+  stroke: transparent;
+}
+
+.handle {
+  r:9;
+  stroke: black;
+  stroke-width:1;
+  fill: lightsteelblue;
+}
+
+</style>
+
+
+</style>
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+
+<html>
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Raleway:300,700|Roboto+Condensed:300,700|Noto+Sans" rel="stylesheet">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+</head>
+<body>
+  <div class="container" >
+  <div class="row" style="border: 1px solid lightgray; border-radius: 8px;">
+    <div class="col-sm-1" >
+      <img src="/ur_cun.png">
+    </div>
+    <div class="col-sm-3" >
+      <p id="p_year" style="font-family: 'Raleway', sans-serif; font-size: 22px; font-weight: 300;">2048 BC</p>
+    </div>
+    <div class="col-sm-7" >
+      <svg width="800" height="50" id="slider">
+        <filter id="dropshadow" height="130%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="1"/>
+            <feOffset dx="1" dy="1" result="offsetblur"/>
+            <feComponentTransfer>
+              <feFuncA type="linear" slope="0.5"/>
+            </feComponentTransfer>
+            <feMerge>
+              <feMergeNode/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+      </svg>
+    </div>
+  </div>
+  <div class="row" style="border: 1px solid lightgray; border-radius: 8px;">
+    <div class="col-sm" style="margin-top: 10px;">
+    <p style="font-family: 'Roboto Condensed', sans-serif; font-size:16px; font-weight:300;">Highlight transactions by searching for keywords in the raw tablet texts.</p>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <div class="input-group-text" style="background-color:#CBD588">
+            <input type="checkbox" id="text_checkbox_0" onClick="link_toggle();">
+          </div>
+        </div>
+        <input type="text" id="text_input_0" class="form-control" style="font-family: 'Raleway', sans-serif; font-size:12px; font-weight:300;" onkeyup="link_toggle();">
+      </div>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <div class="input-group-text" style="background-color:#DA5724">
+            <input type="checkbox" id="text_checkbox_1" onClick="link_toggle();">
+          </div>
+        </div>
+        <input type="text" id="text_input_1" class="form-control" style="font-family: 'Raleway', sans-serif; font-size:12px; font-weight:300;" onkeyup="link_toggle();">
+      </div>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <div class="input-group-text" style="background-color:#74D944">
+            <input type="checkbox" id="text_checkbox_2" onClick="link_toggle();">
+          </div>
+        </div>
+        <input type="text" id="text_input_2" class="form-control" style="font-family: 'Raleway', sans-serif; font-size:12px; font-weight:300;" onkeyup="link_toggle();">
+      </div>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <div class="input-group-text" style="background-color:#CE50CA">
+            <input type="checkbox" id="text_checkbox_3" onClick="link_toggle();">
+          </div>
+        </div>
+        <input type="text" id="text_input_3" class="form-control" style="font-family: 'Raleway', sans-serif; font-size:12px; font-weight:300;" onkeyup="link_toggle();">
+      </div>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <div class="input-group-text" style="background-color:#C0717C">
+            <input type="checkbox" id="text_checkbox_4" onClick="link_toggle();">
+          </div>
+        </div>
+        <input type="text" id="text_input_4" class="form-control" style="font-family: 'Raleway', sans-serif; font-size:12px; font-weight:300;" onkeyup="link_toggle();">
+      </div>
+    </div>
+    <div class="col-sm" style="margin-top: 15px;">
+      <svg width="600" height="600" id="graph"></svg>
+    </div>
+    <div class="col-sm" style="margin-top: 10px;">
+      <div class="tablet" id="tablet_div">
+      </div>
+    </div>
+  </div>
+  <div class="row" style="border: 1px solid lightgray; border-radius: 8px;">
+    <div class="col-sm" style="margin-top: 10px;">
+    <table>
+      <tr>
+    <p style="font-family: 'Roboto Condensed', sans-serif; font-size:16px; font-weight:300;">Scroll to zoom in/out, drag to pan the graph.</p>
+  </tr>
+  <tr>
+    <td align="center"><svg width="150" height="50">
+      <circle cx="85" cy="20" r="30" style="stroke: white; stroke-opacity: 1.0; stroke-width: 0.7px; fill: #bbbbbb; r: 10;"></circle>
+    <svg></td>
+    <td>
+      <p style="font-family: 'Roboto Condensed', sans-serif; font-size:16px; font-weight:300;">Person name (hover to display the name)</p>
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><svg width="150" height="30">
+      <text x="20" y="15" font-family="Roboto Condensed" font-size="16">X</text>
+      <line x1="40" y1="10" x2="130" y2="10" style="stroke: lightsteelblue; stroke-opacity: 0.3; stroke-width: 10px;"></line>
+      <line x1="100" y1="10" x2="130" y2="10" style="stroke: darkslateblue; stroke-opacity: 0.7; stroke-width: 10px;"></line>
+      <text x="140" y="15" font-family="Roboto Condensed" font-size="16">Y</text>
+    </svg></td>
+    <td>
+      <p style="font-family: 'Roboto Condensed', sans-serif; font-size:16px; font-weight:300;">Transaction from X to Y (hover to see the corresponding tablet)</p>
+    </td>
+  </tr>
+  </table>
+  <p style="font-family: 'Roboto Condensed', sans-serif; font-size:12px; font-weight:300;">Data mining and visualization by Alexandre Popoff, all rights reserved, using d3.js and Bootstrap.
+    Please visit <a href="https://github.com/AlexPof/ur3-viz">the GitHub repository</a> for additional information. </p>
+</div>
+  </div>
+</div>
+<div class="tooltip" id="tooltip_div">
+</div>
+
+
+
+  <script>
+  var COLOR_PALETTE = ["#CBD588",  "#DA5724", "#74D944", "#CE50CA", "#C0717C",
+                             "#5F7FC7", "#673770", "#D3D93E",
+                             "#38333E", "#508578", "#D7C1B1", "#689030", "#AD6F3B",
+                             "#CD9BCD", "#D14285", "#6DDE88", "#652926", "#7FDCC0",
+                             "#C84248", "#8569D5", "#5E738F", "#D1A33D", "#8A7C64", "#599861"];
+  var all_graphdata;
+  var year_graph = {};
+  year_graph.nodes = [];
+  year_graph.links = [];
+
+  var svg = d3.select("svg#graph"),
+      width = +svg.attr("width"),
+      height = +svg.attr("height");
+
+  var link_g = svg.append("g")
+          .attr("class", "links")
+          .attr("marker-end", "url(#end)");
+  var node_g = svg.append("g").attr("class", "nodes");
+
+  var slider = d3.select("svg#slider").append("g");
+
+  var year_slider = d3.scaleLinear()
+          .domain([2094, 2006])
+          .range([0, 600])
+          .clamp(true);
+
+  slider.append("line")
+          .attr("x1", year_slider.range()[0])
+          .attr("x2", year_slider.range()[1])
+          .attr("y1", 25)
+          .attr("y2", 25)
+          .attr("stroke","#DDDDDD")
+          .attr("stroke-width",6)
+          .attr("stroke-linecap","round")
+          .select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
+          .attr("class","slider-overlay")
+          .call(d3.drag()
+              .on("start.interrupt", function() { slider.interrupt(); })
+              .on("end drag", function() { the_year = year_slider.invert(d3.event.x);
+                                          handle.attr("cx", year_slider(the_year));
+                                          the_year = Math.round(the_year);
+                                           load_graphyear(the_year);
+                                           display_year(the_year);
+                                           link_toggle();
+                                          }) );
+
+  var handle = slider.insert("circle",".slider-overlay")
+              .attr("class","handle")
+              .attr("filter","url(#dropshadow)")
+              .attr("cy",25)
+              .attr("cx",year_slider(2048));    //add zoom capabilities
+  var zoom_handler = d3.zoom()
+          .on("zoom", function zoom_actions(){d3.selectAll(".nodes").attr("transform", d3.event.transform);
+                                              d3.selectAll(".links").attr("transform", d3.event.transform);});
+
+  zoom_handler(svg);
+
+    svg.append("svg:defs").selectAll("marker")
+          .data(["end"])      // Different link/path types can be defined here
+        .enter().append("svg:marker")    // This section adds in the arrows
+          .attr("id", String)
+          .attr("viewBox", "0 -6 10 12")
+          .attr("refX", 16)
+          .attr("refY", 0)
+          .attr("markerWidth", 5)
+          .attr("markerHeight", 5)
+          .attr("orient", "auto")
+        .append("svg:path")
+          .attr("d", "M0,0L12,0")
+          .attr("stroke", "darkslateblue")
+          .attr("fill", "none")
+          .attr("stroke-opacity",0.7)
+          .attr("stroke-width","2px");
+
+  var simulation = d3.forceSimulation()
+      .force("link", d3.forceLink().distance(10).id(function(d) { return d.name; }))
+      .force("charge",d3.forceManyBody().strength(-50))
+      .force('x', d3.forceX(width / 2).strength(0.1))
+      .force('y', d3.forceY(height / 2).strength(0.1))
+      .on("tick",ticked);
+
+
+  d3.json("/all.json", function(error, graph) {
+    if (error) throw error;
+    all_graphdata = graph;
+    load_graphyear(2048);
+    display_year(2048);
+    });
+
+  function link_toggle() {
+    link_g.selectAll("line")
+          .style("stroke-opacity",0.2)
+          .style("stroke-width",1)
+          .style("stroke", "lightsteelblue");
+    for (var i=0;i<5;i++) {
+        if (d3.select("#text_checkbox_"+i).property("checked")) {
+          keyword = d3.select("#text_input_"+i).property("value");
+          if(keyword!="") {
+            link_g.selectAll("line")
+                  .style("stroke-opacity",function(d) {return d.raw.includes(keyword)? 0.5: d3.select(this).style("stroke-opacity");})
+                  .style("stroke-width",function(d) {return d.raw.includes(keyword)? 1.2: d3.select(this).style("stroke-width");})
+                  .style("stroke", function(d) {return d.raw.includes(keyword)? COLOR_PALETTE[i]: d3.select(this).style("stroke");});
+          }
+        }
+    }
+  }
+
+  function load_graphyear(year) {
+    var tablet_div = d3.select("#tablet_div");
+    var tooltip_div = d3.select("#tooltip_div");
+
+    year_graph.links = [];
+    //simulation.nodes([]);
+    //simulation.force("link").links([]);
+    var source="";
+    var target="";
+    var new_node_names = [];
+    for(var i=0;i<all_graphdata.links.length;i++){
+      if (all_graphdata.links[i]["year"]==year) {
+        year_graph.links.push({"source":all_graphdata.links[i].source,
+                               "target":all_graphdata.links[i].target,
+                               "value":all_graphdata.links[i].value,
+                               "year":all_graphdata.links[i].year,
+                               "raw":all_graphdata.links[i].raw,
+                               "cdli":all_graphdata.links[i].cdli})
+        source = all_graphdata.links[i]["source"]
+        target = all_graphdata.links[i]["target"]
+        if (new_node_names.indexOf(source) == -1) { new_node_names.push(source);}
+        if (new_node_names.indexOf(target) == -1) { new_node_names.push(target);}
+      }
+    }
+
+    for(var i=0;i<year_graph.links.length;i++){
+      source = year_graph.links[i]["source"]
+      target = year_graph.links[i]["target"]
+      var source_present = dummy_find(year_graph.nodes,source);
+      var target_present = dummy_find(year_graph.nodes,target);
+
+      if (!source_present && !target_present) {
+        var new_pos = {"x":width/2+(300*Math.random()-150),"y":height/2+(300*Math.random()-150)}
+        year_graph.nodes.push({"name":source,"group":1, "x": new_pos.x, "y":new_pos.y});
+        year_graph.nodes.push({"name":target,"group":1, "x": new_pos.x+(50*Math.random()-25), "y":new_pos.y+(50*Math.random()-25)});
+      } else if (!source_present) {
+        var new_pos = find_nodepos_byname(target);
+        year_graph.nodes.push({"name":source,"group":1, "x": new_pos.x+(50*Math.random()-25), "y":new_pos.y+(50*Math.random()-25)})
+      } else if (!target_present) {
+        var new_pos = find_nodepos_byname(source);
+        year_graph.nodes.push({"name":target,"group":1, "x": new_pos.x+(50*Math.random()-25), "y":new_pos.y+(50*Math.random()-25)})
+      }
+    }
+    year_graph.nodes = year_graph.nodes.filter(function (d) {return new_node_names.indexOf(d.name)>-1;})
+
+
+    //svg.selectAll(".nodes").remove();
+    //svg.selectAll(".links").remove();
+
+
+    var link_data = link_g.selectAll("line").data(year_graph.links);
+    var node_data = node_g.selectAll("circle").data(year_graph.nodes, function (d) {return d.name});
+    node_data.exit().remove();
+    link_data.exit().remove();
+
+    var node_data_entered = node_data.enter().append("circle")
+        .on("mouseover", function(d) {
+                          tooltip_div.transition()
+                                     .duration(200)
+                                     .style("opacity", .9);
+                          tooltip_div.html(d.name)
+                              .style("left", (d3.event.pageX) + "px")
+                              .style("top", (d3.event.pageY - 28) + "px");
+                          })
+        .on("mouseout", function(d) {
+                          tooltip_div.transition()
+                                     .duration(500)
+                                     .style("opacity", 0);
+                                    })
+        .call(d3.drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended));
+
+    var link_data_entered = link_data.enter().append("line")
+      .on("mouseover", function(d) {
+                        link_data_entered.style("stroke-opacity",function (o) { return d.index==o.index? 1 : d3.select(this).style("stroke-opacity");});
+                        link_data_entered.style("stroke-width",function (o) { return d.index==o.index? 1.5 : d3.select(this).style("stroke-width");});
+                        tablet_div.transition()
+                                   .duration(200)
+                                   .style("opacity", .9);
+                                   tablet_div.html(tablet_text(d.raw));
+                            //tablet_div.html("<img src='https://cdli.ucla.edu/dl/photo/P"+d.cdli+".jpg' width='150px'><br><p>"+d.raw.replace(/\n/g, "<br />")+"</p>");
+                        })
+      .on("mouseout", function(d) {
+                        link_toggle();
+                        //link_data_entered.style("stroke-opacity",0.07);
+                        //link_data_entered.style("stroke-width",1);
+                        tablet_div.transition()
+                                   .duration(500)
+                                   .style("opacity", 0);
+                                  });
+
+
+    simulation.stop();
+    simulation.nodes(year_graph.nodes);
+    simulation.force("link").links(year_graph.links);
+    simulation.alpha(0.1).restart();
+  }
+
+  function ticked() {
+    svg.select(".links").selectAll("line")
+        .attr("x1", function(d) { return d.source.x; })
+        .attr("y1", function(d) { return d.source.y; })
+        .attr("x2", function(d) { return d.target.x; })
+        .attr("y2", function(d) { return d.target.y; });
+
+    svg.select(".nodes").selectAll("circle")
+        .attr("cx", function(d) { return d.x; })
+        .attr("cy", function(d) { return d.y; });
+  }
+
+
+  function dragstarted(d) {
+    if (!d3.event.active) simulation.alphaTarget(0.1).restart();
+    d.fx = d.x;
+    d.fy = d.y;
+  }
+
+  function dragged(d) {
+    d.fx = d3.event.x;
+    d.fy = d3.event.y;
+  }
+
+  function dragended(d) {
+    if (!d3.event.active) simulation.alphaTarget(0);
+    d.fx = null;
+    d.fy = null;
+  }
+
+  function tablet_text(raw_text) {
+    var splitted = raw_text.split("\n");
+    var html_text = "<span>"+splitted[0]+"</span><br><span>";
+
+    for (i=1;i<splitted.length;i++) {
+      if (splitted[i][0]!="#" && splitted[i][0]!="$") {
+        if (splitted[i][0]=="@") {
+          html_text = html_text+"</span><span style='color:lightsteelblue;'>"+splitted[i]+"</span><br><span>"
+        }
+        else {
+          html_text = html_text+splitted[i]+"<br>"
+        }
+      }
+    }
+    return html_text+"</span>"
+  }
+
+  function display_year(the_year) {
+    d3.select("#p_year").html(the_year+" BC - "+all_graphdata["Y_2_SUMY"][the_year]);
+  }
+
+  function dummy_find(arr,x) {
+    for (var i=0;i<arr.length;i++) {
+      if (x==arr[i].name) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function find_nodepos_byname(the_name) {
+    for (var i=0;i<year_graph.nodes.length;i++) {
+      if (the_name==year_graph.nodes[i].name) {
+        return {"x":year_graph.nodes[i]["x"],"y":year_graph.nodes[i]["y"]};
+      }
+    }
+    return {}
+  }
+
+  </script>
+</body>
+</html>
