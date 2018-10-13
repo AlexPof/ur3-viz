@@ -32,7 +32,9 @@ In addition to fixing the above limitations, the next steps may include deeper a
 
 This project aims at visualizing the flows of various goods between the different actors during the Ur III period.
 The current visualization shows a chord diagram indicating the cumulative directed flows during the selected period, for the selected goods.
+
 In case multiple merchandises are selected, their total flow are summed. For example, it thus allows to analyze the total cattle flows as sum of 'ab₂' (cow), 'gu₄' (ox), etc. (it would be irrelevant, on the other side, to sum 'gu₄' (ox) and 'še' (barley)).
+
 Units of flows are the natural implicit units found in the tablets: head counts for cattle, 'sila₃' for cereals, etc.
 
 The most recent data visualization can be [accessed here](https://alexpof.github.io/ur3-viz/transactional_flows/index.html)
@@ -42,4 +44,4 @@ The current limitations of this project are as follows.
 * Only tablets for which the year is well identified are considered.
 * Transactions with more than one 'sender', or more than one 'receiver', are currently not considered
 * Not all PNs, or other administrative functions, are properly identified. In particular, the description of PNs as 'son of' another PN (in sumerian, 'PN dumu PN') is not correctly implemented.
-* Additional goods (such as ).
+* Each additional good (such as wheat, flour, etc.) has to be specifically parsed in the analysis.
