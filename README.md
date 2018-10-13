@@ -15,7 +15,7 @@ This project currently aims at identifying two-parties transactions, and buildin
 In addition, since the year can often be identified in the texts, one obtains a time-varying graph.
 The current visualization approach gives control over the year, and dynamically updates the graph as it is changed.
 
-The most recent data visualization can be [accessed here](https://alexpof.github.io/ur3-viz/index.html)
+The most recent data visualization can be [accessed here](https://alexpof.github.io/ur3-viz/transactional_network/)
 
 The current limitations of this project are as follows.
 
@@ -35,7 +35,7 @@ The current visualization shows a chord diagram indicating the cumulative direct
 In case multiple merchandises are selected, their total flow are summed. For example, it thus allows to analyze the total cattle flows as sum of 'ab₂' (cow), 'gu₄' (ox), etc. (it would be irrelevant, on the other side, to sum 'gu₄' (ox) and 'še' (barley)).
 Units of flows are the natural implicit units found in the tablets: head counts for cattle, 'sila₃' for cereals, etc.
 
-The most recent data visualization can be [accessed here](https://alexpof.github.io/ur3-viz/transaction_flow_chord.html)
+The most recent data visualization can be [accessed here](https://alexpof.github.io/ur3-viz/transactional_flows/)
 
 The current limitations of this project are as follows.
 

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+		<title>Testing</title>
+
+		<!-- D3.js & tool-tip -->
+		<script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
+
+		<!-- Google Fonts -->
+		<link href='https://fonts.googleapis.com/css?family=Lato:400,900' rel='stylesheet' type='text/css'>
+		<link href="https://fonts.googleapis.com/css?family=Raleway:300,700|Roboto+Condensed:300,700|Noto+Sans" rel="stylesheet">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+		<style>
+			body {
+			  font-size: 12px;
+			  font-family: 'Lato', sans-serif;
+			  fill: #2B2B2B;
+			  cursor: default;
+			}
+
+			.handle {
+			  r:7;
+			  stroke: black;
+			  stroke-width:1;
+			}
+
+			div.tooltip {
+			  position: absolute;
+			  text-align: center;
+			  width: 175px;
+			  height: 45px;
+			  padding: 2px;
+			  font-family: 'Roboto', sans-serif;
+			  font-size: 14px;
+			  font-weight:300;
+			  color: #FFFFFF;
+			  background: steelblue;
+			  border: 0px;
+			  border-radius: 4px;
+			  pointer-events: none;
+			  opacity:0;
+			  box-shadow: 2px 2px 5px steelblue;
+			}
+
+			@media (min-width: 600px) {
+				#chart{
+					font-size: 14px;
+				}
+			}
+		</style>
+
+	</head>
+	<body>
+			<div class="tooltip" id="tooltip_div">
+			</div>
+			<div class="container" >
+		  	<div class="row" style="border: 1px solid lightgray; border-radius: 8px;">
+					<div class="col-sm-3" >
+						<p id="p_year" style="font-family: 'Raleway', sans-serif; font-size: 16px; font-weight: 300;"></p>
+					</div>
+					<div class="col-sm-7" >
+						<svg width="800" height="50" id="slider">
+							<filter id="dropshadow" height="130%">
+									<feGaussianBlur in="SourceAlpha" stdDeviation="1"/>
+									<feOffset dx="1" dy="1" result="offsetblur"/>
+									<feComponentTransfer>
+										<feFuncA type="linear" slope="0.5"/>
+									</feComponentTransfer>
+									<feMerge>
+										<feMergeNode/>
+										<feMergeNode in="SourceGraphic"/>
+									</feMerge>
+								</filter>
+						</svg>
+					</div>
+				</div>
+				<div class="row" style="border: 1px solid lightgray; border-radius: 8px;">
+					<div class="col" id="all_checkboxes">
+					</div>
+					<div class="col" id="chart">
+					</div>
+				</div>
+			</div>
+		<script src = "/transaction_flow_chord.js"></script>
+  </body>
+</html>
