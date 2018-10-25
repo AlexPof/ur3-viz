@@ -23,7 +23,7 @@ var FLOW_MATRIX = [];
 var GOODS=[];
 var YEAR_DATA=[];
 
-d3.json("/ur3-viz/transactional_flows/transaction_flow_data.json", function(error, json_data) {
+d3.json("/static/all_merch.json", function(error, json_data) {
 	if (error) throw error;
 
 	MERCH_DATA = json_data.qties;
@@ -40,7 +40,7 @@ d3.json("/ur3-viz/transactional_flows/transaction_flow_data.json", function(erro
   	cb_html += '</div>';
 	}
 	cb_html += "</form>";
-  d3.select("#all_checkboxes").html(cb_html);
+	d3.select("#all_checkboxes").html(cb_html);
 
 	redraw_data();
 	display_year(START_YEAR,END_YEAR);
@@ -150,14 +150,13 @@ function redraw_data() {
 	}
 	NAMES = NAMES.filter( onlyUnique );
 
+	var n = NAMES.length;
+
 	FLOW_MATRIX=[];
-	var sym_matrix = [];
-	for(var i=0;i<NAMES.length;i++) {
+	for(var i=0;i<n;i++) {
 		FLOW_MATRIX[i]=[];
-		sym_matrix[i]=[];
-		for(var j=0;j<NAMES.length;j++) {
+		for(var j=0;j<n;j++) {
 			FLOW_MATRIX[i][j]=0.0;
-			sym_matrix[i][j]=0.0;
 		}
 	}
 
@@ -170,28 +169,93 @@ function redraw_data() {
 		}
 		var year = MERCH_DATA[i].YEAR_BC;
 		if (year<=START_YEAR && year>=END_YEAR && qty>0) {
-			FLOW_MATRIX[source_idx][target_idx] += qty;
-			FLOW_MATRIX[target_idx][source_idx] -= qty;
+			FLOW_MATRIX[target_idx][source_idx] += qty;
 		}
 	}
 
-	for(var i=0;i<NAMES.length;i++) {
-		for(var j=0;j<NAMES.length;j++) {
-      var value = Math.abs(FLOW_MATRIX[i][j]);
-      sym_matrix[i][j] = value;
+	var out_flows = new Array(n);
+	for(var i=0;i<n;i++) {
+		var x=0;
+		for(var j=0;j<n;j++) {
+			x+=FLOW_MATRIX[j][i];
 		}
+		out_flows[i] = x;
+	}
+	var in_flows = new Array(n);
+	for(var i=0;i<n;i++) {
+		var x=0;
+		for(var j=0;j<n;j++) {
+			x+=FLOW_MATRIX[i][j];
+		}
+		in_flows[i] = x;
+	}
+	var total_flow = new Array(n);
+	var total=0;
+	for(var i=0;i<n;i++) {
+		total_flow[i] = in_flows[i]+out_flows[i];
+		total+=total_flow[i];
 	}
 
+	var padAngle = 0.03;
+	var circular_SF = Math.max(0, 2*Math.PI - padAngle * n) / total;
+	var delta_angle = circular_SF ? padAngle : 2*Math.PI / n;
+
+	chord_data = [];
+	groups = chord_data.groups = new Array(n);
+	var x=0;
+	for(var i=0;i<n;i++) {
+		groups[i] = {
+        index: i,
+        startAngle: x,
+				midAngle: x+out_flows[i]*circular_SF,
+        endAngle: x+total_flow[i]*circular_SF,
+        value: total_flow[i]
+      };
+		x += total_flow[i]*circular_SF+delta_angle;
+	}
+
+	var dummy_angles = new Array(n);
+	for(var i=0;i<n;i++) {
+		dummy_angles[i]=groups[i].midAngle;
+	}
+	for(var i=0;i<n;i++) {
+		x=groups[i].startAngle;
+		for(var j=0;j<n;j++) {
+			qty = FLOW_MATRIX[j][i];
+			if (qty>0.0){
+				source_startAngle = x;
+				x += circular_SF*qty;
+				source_endAngle = x;
+
+				target_startAngle = dummy_angles[j];
+				dummy_angles[j] += circular_SF*qty;
+				target_endAngle = dummy_angles[j];
+
+				chord_data.push({ source:{index:i,subindex:j,startAngle:source_startAngle,endAngle:source_endAngle,value:qty},
+													target:{index:j,subindex:i,startAngle:target_startAngle,endAngle:target_endAngle,value:qty}
+												});
+			}
+		}
+	}
 
 	////////////////////////////////////////////////////////////
 	/////////// Create scale and layout functions //////////////
 	////////////////////////////////////////////////////////////
 
 	var opacityDefault = 1.0;
+	var totalflow_color = "darkgray";
+	var inflow_color = "rgb(255,52,0)";
+	var outflow_color = "rgb(0,255,173)";
+	var chord_color = "lightsteelblue";
 
-	var chord = d3.chord()
-	    .padAngle(.03)
-	    .sortChords(d3.descending);
+	/*
+	// ALTERNATIVE COLORS FOR INFLOWS AND OUTFLOWS
+	var inflow_color = "rgb(255,114,0)";
+	var outflow_color = "rgb(0,219,255)";
+
+	var inflow_color = "rgb(255,249,0)";
+	var outflow_color = "rgb(108,0,255)";
+	*/
 
 	var arc = d3.arc()
 	    .innerRadius(innerRadius*1.01)
@@ -199,8 +263,6 @@ function redraw_data() {
 
 	var path = d3.ribbon()
 			.radius(innerRadius);
-
-	chord_data = chord(sym_matrix);
 
 	var outerArcs = CHORD_SVG.selectAll("g.group").data(chord_data.groups, function(d) {return NAMES[d.index]});
 
@@ -213,6 +275,14 @@ function redraw_data() {
 			 	        			.filter(function(d) { return d.source.index != i && d.target.index != i; })
 			 								.transition()
 			 	        			.style("opacity", 0.1);
+						 CHORD_SVG.selectAll("path.chord")
+				 			 	      .filter(function(d) { return d.source.index == i; })
+				 			 				.transition()
+				 			 	      .style("fill", inflow_color);
+					 	 CHORD_SVG.selectAll("path.chord")
+				 			 	      .filter(function(d) { return d.target.index == i; })
+				 			 				.transition()
+				 			 	      .style("fill", outflow_color);
 						var tooltip_div = d3.select("#tooltip_div");
 						tooltip_div.transition()
 											 .duration(200)
@@ -223,8 +293,8 @@ function redraw_data() {
 					 })
 					 .on("mouseout", function (d,i) {
 						 CHORD_SVG.selectAll("path.chord")
-			 	        			.filter(function(d) { return d.source.index != i && d.target.index != i; })
 			 								.transition()
+											.style("fill", chord_color)
 			 	        			.style("opacity", 1.0);
 						 var tooltip_div = d3.select("#tooltip_div");
 				 		tooltip_div.transition()
@@ -233,11 +303,34 @@ function redraw_data() {
 					 });
 
   new_groups.append("path")
-						.style("fill", "darkgray")
+						.attr("class", "totalflow_arc")
+						.style("fill", totalflow_color)
  						.style("fill-opacity", "0.4")
  						.style("stroke", "darkgray")
  						.style("stroke-opacity", "0.6")
  						.attr("d", arc);
+ new_groups.append("path")
+ 						.attr("class", "inflow_arc")
+						.style("fill", inflow_color)
+ 						.style("fill-opacity", "0.4")
+ 						.style("stroke", "darkgray")
+ 						.style("stroke-opacity", "0.6")
+ 						.attr("d", function (d) { var temp_arc = d3.arc(); return temp_arc({
+																							 innerRadius:innerRadius*1.01,
+																							 outerRadius:innerRadius*1.025,
+																							 startAngle:d.startAngle,
+																							 endAngle:d.midAngle}); });
+ new_groups.append("path")
+ 						.attr("class", "outflow_arc")
+						.style("fill", outflow_color)
+ 						.style("fill-opacity", "0.4")
+ 						.style("stroke", "darkgray")
+ 						.style("stroke-opacity", "0.6")
+ 						.attr("d", function (d) { var temp_arc = d3.arc(); return temp_arc({
+																							 innerRadius:innerRadius*1.01,
+																							 outerRadius:innerRadius*1.025,
+																							 startAngle:d.midAngle,
+																							 endAngle:d.endAngle}); });
   new_groups.append("text")
 						.each(function(d) { d.angle = (d.startAngle + d.endAngle) / 2; })
 						.attr("dy", ".35em")
@@ -250,12 +343,32 @@ function redraw_data() {
 										 + (d.angle > Math.PI ? "rotate(180)" : "");
 									 });
 
-	outerArcs.select("path")
-					 .style("fill", "darkgray")
+	outerArcs.select("path.totalflow_arc")
+					 .style("fill", totalflow_color)
 					 .style("fill-opacity", "0.4")
 					 .style("stroke", "darkgray")
 					 .style("stroke-opacity", "0.6")
 					 .attr("d", arc);
+ outerArcs.select("path.inflow_arc")
+					 .style("fill", inflow_color)
+					 .style("fill-opacity", "0.4")
+					 .style("stroke", "darkgray")
+					 .style("stroke-opacity", "0.6")
+					 .attr("d", function (d) { var temp_arc = d3.arc(); return temp_arc({
+																							innerRadius:innerRadius*1.01,
+																							outerRadius:innerRadius*1.025,
+																							startAngle:d.startAngle,
+																							endAngle:d.midAngle}); });
+ outerArcs.select("path.outflow_arc")
+					 .style("fill", outflow_color)
+					 .style("fill-opacity", "0.4")
+					 .style("stroke", "darkgray")
+					 .style("stroke-opacity", "0.6")
+					 .attr("d", function (d) { var temp_arc = d3.arc(); return temp_arc({
+																							innerRadius:innerRadius*1.01,
+																							outerRadius:innerRadius*1.025,
+																							startAngle:d.midAngle,
+																							endAngle:d.endAngle}); });
 	outerArcs.select("text")
 					 .each(function(d) { d.angle = (d.startAngle + d.endAngle) / 2; })
 					 .attr("dy", ".35em")
@@ -275,7 +388,7 @@ function redraw_data() {
 	chords.exit().remove();
 
 	chords.enter().append("path").attr("class", "chord")
-				.style("fill", "lightsteelblue")
+				  .style("fill", chord_color)
 					.style("fill-opacity","0.5")
 					.style("stroke","black")
 					.style("stroke-opacity","0.25")
@@ -288,13 +401,9 @@ function redraw_data() {
 											.style("opacity", 0.9);
 					var the_html = "";
 
-					if (FLOW_MATRIX[d.source.index][d.target.index]>0.0) {
 						the_html += NAMES[d.source.index]+" ➡ "+NAMES[d.target.index];
 						the_html += "<br>Qty:"+[d.source.value].toString();
-					} else {
-						the_html += NAMES[d.target.index]+" ➡ "+NAMES[d.source.index];
-						the_html += "<br>Qty:"+[d.target.value].toString();
-					}
+
 					 tooltip_div.html(the_html)
 											.style("left", (d3.event.pageX) + "px")
 											.style("top", (d3.event.pageY - 28) + "px");
@@ -326,23 +435,13 @@ function redraw_data() {
 				t_ea = d.target.endAngle-3.1416/2.;
 				arrow_offset = radius-7*ratio*Math.sqrt(radius*(t_ea-t_sa));
 
-				if (FLOW_MATRIX[d.source.index][d.target.index]>0.0){
-					context.moveTo(radius*Math.cos(s_sa), radius*Math.sin(s_sa));
-					context.arc(0, 0, radius, s_sa, s_ea);
-					context.quadraticCurveTo(0, 0, arrow_offset*Math.cos(t_sa), arrow_offset*Math.sin(t_sa));
-					context.lineTo(radius*Math.cos(0.5*t_sa+0.5*t_ea), radius*Math.sin(0.5*t_sa+0.5*t_ea))
-					context.lineTo(arrow_offset*Math.cos(t_ea), arrow_offset*Math.sin(t_ea))
-					context.quadraticCurveTo(0, 0, radius*Math.cos(s_sa), radius*Math.sin(s_sa));
-					context.closePath();
-				} else {
-					context.moveTo(radius*Math.cos(t_sa), radius*Math.sin(t_sa));
-					context.arc(0, 0, radius, t_sa, t_ea);
-					context.quadraticCurveTo(0, 0, arrow_offset*Math.cos(s_sa), arrow_offset*Math.sin(s_sa));
-					context.lineTo(radius*Math.cos(0.5*s_sa+0.5*s_ea), radius*Math.sin(0.5*s_sa+0.5*s_ea))
-					context.lineTo(arrow_offset*Math.cos(s_ea), arrow_offset*Math.sin(s_ea))
-					context.quadraticCurveTo(0, 0, radius*Math.cos(t_sa), radius*Math.sin(t_sa));
-					context.closePath();
-				}
+				context.moveTo(radius*Math.cos(s_sa), radius*Math.sin(s_sa));
+				context.arc(0, 0, radius, s_sa, s_ea);
+				context.quadraticCurveTo(0, 0, arrow_offset*Math.cos(t_sa), arrow_offset*Math.sin(t_sa));
+				context.lineTo(radius*Math.cos(0.5*t_sa+0.5*t_ea), radius*Math.sin(0.5*t_sa+0.5*t_ea))
+				context.lineTo(arrow_offset*Math.cos(t_ea), arrow_offset*Math.sin(t_ea))
+				context.quadraticCurveTo(0, 0, radius*Math.cos(s_sa), radius*Math.sin(s_sa));
+				context.closePath();
 				return context;
 			};
 		}
