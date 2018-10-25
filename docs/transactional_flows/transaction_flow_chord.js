@@ -23,7 +23,7 @@ var FLOW_MATRIX = [];
 var GOODS=[];
 var YEAR_DATA=[];
 
-d3.json("/static/all_merch.json", function(error, json_data) {
+d3.json("/ur3-viz/static/transaction_flow_data.json", function(error, json_data) {
 	if (error) throw error;
 
 	MERCH_DATA = json_data.qties;
