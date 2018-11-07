@@ -4,7 +4,7 @@ var SVG_SIZE = 800;
 var START_DRAG = {"x":0,"y":0};
 var DRAG_FLAG = 0;
 
-var CIRCLE_SVG = d3.select("body").append("svg")
+var CIRCLE_SVG = d3.select("#svg_row").append("svg")
 		.attr("width", SVG_SIZE)
 		.attr("height", SVG_SIZE)
 		.append("g")
