@@ -12,10 +12,26 @@ The texts of the tablets exhibit repeatable patterns, which makes it an interest
 ## Transactional network
 
 This project currently aims at identifying two-parties transactions, and building the corresponding transactional network.
-In addition, since the year can often be identified in the texts, one obtains a time-varying graph.
-The current visualization approach gives control over the year, and dynamically updates the graph as it is changed.
+In addition, since the year can often be identified in the texts, one obtains potentially a time-varying graph.
+We have tested
+
+### Visualization using force-layouts
+
+This visualization approach uses a force layout, where links between nodes (corresponding to tablets with two-parties transactions) are
+modelled as springs and exert forces on the nodes.
+The visualization also gives control over the year, and dynamically updates the graph as it is changed.
 
 The most recent data visualization can be [accessed here](https://alexpof.github.io/ur3-viz/transactional_network/index.html)
+
+### Visualization using Poincaré embeddings
+
+This experimental approach to visualizing the transactional network uses Nickel & Kiela's
+[Poincaré Embeddings for Learning Hierarchical Representations](https://papers.nips.cc/paper/7213-poincare-embeddings-for-learning-hierarchical-representations) for representing the directed graph of transactions.
+
+The most recent data visualization can be [accessed here](https://alexpof.github.io/ur3-viz/transactional_network_poincare/index.html) and shows the transactional networks for the years between 2052 BC and 2049 BC. Unlike the previous visualization, no control over the time period is possible, as it would require to re-compute the embeddings each time.
+
+
+### Limitations
 
 The current limitations of this project are as follows.
 
