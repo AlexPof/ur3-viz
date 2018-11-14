@@ -324,7 +324,7 @@ var handle_right = slider.insert("circle",".slider-overlay")
       .on("tick",ticked);
 
 
-  d3.json("/ur3-viz/transactional_network/all.json", function(error, graph) {
+  d3.json("/static/force_layout.json", function(error, graph) {
     if (error) throw error;
     all_graphdata = graph;
     load_graphyear(the_year_start,the_year_end);
@@ -417,7 +417,7 @@ var handle_right = slider.insert("circle",".slider-overlay")
                           tooltip_div.transition()
                                      .duration(200)
                                      .style("opacity", .9);
-                          tooltip_div.html(d.name)
+                          textip_div.html(d.name)
                               .style("left", (d3.event.pageX) + "px")
                               .style("top", (d3.event.pageY - 28) + "px");
                           })
@@ -438,7 +438,7 @@ var handle_right = slider.insert("circle",".slider-overlay")
                         tablet_div.transition()
                                    .duration(200)
                                    .style("opacity", .9);
-                                   tablet_div.html(tablet_text(d.raw));
+                                   tablet_div.html(tablet_text(d.raw,d.cdli));
                             //tablet_div.html("<img src='https://cdli.ucla.edu/dl/photo/P"+d.cdli+".jpg' width='150px'><br><p>"+d.raw.replace(/\n/g, "<br />")+"</p>");
                         })
       .on("mouseout", function(d) {
@@ -463,7 +463,6 @@ var handle_right = slider.insert("circle",".slider-overlay")
           var vect_x = -(d.target.y-d.source.y);
           var vect_y = (d.target.x-d.source.x);
           var n = Math.sqrt(vect_x*vect_x+vect_y*vect_y);
-          if(n==0) console.log(n,d.target,d.source);
           var q_x = 0.5*(d.target.x+d.source.x)+d.bend*vect_x/n;
           var q_y = 0.5*(d.target.y+d.source.y)+d.bend*vect_y/n;
           var path_data = "M ";
@@ -496,11 +495,11 @@ var handle_right = slider.insert("circle",".slider-overlay")
     d.fy = null;
   }
 
-  function tablet_text(raw_text) {
+  function tablet_text(raw_text,cdli_number) {
     var splitted = raw_text.split("\n");
-    var html_text = "<span>"+splitted[0]+"</span><br><span>";
+    var html_text = "<span>P"+cdli_number.toString()+"</span><br><span>";
 
-    for (i=1;i<splitted.length;i++) {
+    for (i=0;i<splitted.length;i++) {
       if (splitted[i][0]!="#" && splitted[i][0]!="$") {
         if (splitted[i][0]=="@") {
           html_text = html_text+"</span><span style='color:lightsteelblue;'>"+splitted[i]+"</span><br><span>"
