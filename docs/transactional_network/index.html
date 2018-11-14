@@ -324,7 +324,7 @@ var handle_right = slider.insert("circle",".slider-overlay")
       .on("tick",ticked);
 
 
-  d3.json("/static/all.json", function(error, graph) {
+  d3.json("/ur3-viz/transactional_network/all.json", function(error, graph) {
     if (error) throw error;
     all_graphdata = graph;
     load_graphyear(the_year_start,the_year_end);
