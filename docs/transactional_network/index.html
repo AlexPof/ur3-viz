@@ -24,7 +24,6 @@
   stroke-opacity: 1.0;
   stroke-width: 0.7px;
   fill: #bbbbbb;
-  r: 3;
 }
 
 div.tooltip {
@@ -61,7 +60,6 @@ div.tablet {
 }
 
 .handle {
-  r:7;
   stroke: black;
   stroke-width:1;
 }
@@ -259,6 +257,7 @@ div.tablet {
               .attr("filter","url(#dropshadow)")
               .attr("fill","lightsteelblue")
               .attr("opacity",0.8)
+              .attr("r",7)
               .attr("cy",25)
               .attr("cx",year_slider(the_year_start))
               .call(d3.drag()
@@ -280,6 +279,7 @@ var handle_right = slider.insert("circle",".slider-overlay")
             .attr("filter","url(#dropshadow)")
             .attr("fill","lightsteelblue")
             .attr("opacity",0.8)
+            .attr("r",7)
             .attr("cy",25)
             .attr("cx",year_slider(the_year_end))
             .call(d3.drag()
@@ -417,6 +417,7 @@ var handle_right = slider.insert("circle",".slider-overlay")
     link_data.exit().remove();
 
     var node_data_entered = node_data.enter().append("circle")
+        .attr("r",3)
         .on("mouseover", function(d) {
                           tooltip_div.transition()
                                      .duration(200)
