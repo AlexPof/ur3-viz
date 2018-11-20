@@ -9,6 +9,8 @@ About 65,000 cuneiform tablets are known, which record various types of transact
 
 The texts of the tablets exhibit repeatable patterns, which makes it an interesting, though challenging, task for a data science project.
 
+*Please note that the proposed visualizations are best viewed with Chrome or Firefox. Compatibility with Internet Explorer and Microsoft Edge is not guaranteed*
+
 ## Transactional network
 
 This project currently aims at identifying two-parties transactions, and building the corresponding transactional network.
